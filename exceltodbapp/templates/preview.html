@@ -1,0 +1,45 @@
+<!-- templates/preview.html -->
+<h2>Preview Data</h2>
+
+{% if errors %}
+<h3 style="color: red">There are validation errors in the following rows:</h3>
+<ul>
+  {% for error in errors %}
+  <li>
+    Row {{ error.row }}: {% for field, message in error.errors.items %}
+    <strong>{{ field }}:</strong> {{ message }} {% endfor %}
+  </li>
+  {% endfor %}
+</ul>
+<p>Please fix the errors in the Excel file and try again.</p>
+<a href="{% url 'upload' %}"> <button>Go back</button></a>
+{% else %}
+<form method="POST" action="{% url 'confirm_push' %}">
+  {% csrf_token %}
+  <table border="1">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Age</th>
+        <th>Email</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in data %}
+      <tr>
+        <td>{{ row.name }}</td>
+        <td>{{ row.age }}</td>
+        <td>{{ row.email }}</td>
+      </tr>
+      <!-- Hidden input to send data to the confirm view -->
+      <input
+        type="hidden"
+        name="data"
+        value="{{ row.name }},{{ row.age }},{{ row.email }}"
+      />
+      {% endfor %}
+    </tbody>
+  </table>
+  <button type="submit">Confirm and Push to DB</button>
+</form>
+{% endif %}
